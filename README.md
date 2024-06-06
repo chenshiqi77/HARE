@@ -329,17 +329,9 @@ Step.2 **开始微调**
 
 **视频展示**
 
-<iframe  
-    width="100%"  
-    height="450"  
-    src="//player.bilibili.com/player.html?isOutside=true&aid=1955464576&bvid=BV1Ry411b7yx&cid=1573499740&p=1"  
-    scrolling="no"  
-    border="0"  
-    frameborder="no"  
-    framespacing="0"  
-    allowfullscreen="true">
-video
-</iframe> 
+<p>
+<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=1955464576&bvid=BV1Ry411b7yx&cid=1573499740&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+</p>
 
 
 如您对小模型在端侧上进行工具调用感兴趣，您可以阅读我们的[技术报告](https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25)，也欢迎您与我们共同探讨和深入研究。
