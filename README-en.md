@@ -327,23 +327,9 @@ When you are ready to fine-tune the data, you can follow the official guidance o
 
 ## Tool Call Practice
 
-In order to fully utilize the advantages of small models in terminal deployment, we compared the work of [Octopus v2](https://huggingface.co/NexaAIDev/Octopus-v2) and successfully implemented the Android system API call and tool call capabilities in combined scenarios on the mobile phone.
+To fully leverage the advantages of small models in end-to-end deployment, we compared them with [Octopus v2](https://huggingface.co/NexaAIDev/Octopus-v2) Successfully implemented Android system API calls and tool invocation capabilities in combination scenarios on the mobile end by replacing Gemma-2B with Hare-1.1B-base.
 
-**Show Video**
-
-<iframe  
-    width="100%"  
-    height="450"  
-    src="//player.bilibili.com/player.html?isOutside=true&aid=1955464576&bvid=BV1Ry411b7yx&cid=1573499740&p=1"  
-    scrolling="no"  
-    border="0"  
-    frameborder="no"  
-    framespacing="0"  
-    allowfullscreen="true">
-video
-</iframe> 
-
-
+**Show Video**(https://www.bilibili.com/video/BV1Ry411b7yx)
 
 If you are interested in tool calls for small models on the terminal, you can read our [Technical Report](https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25), and you are also welcome to discuss and study with us.
 

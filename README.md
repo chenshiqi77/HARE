@@ -327,12 +327,7 @@ Step.2 **开始微调**
 
 为完全发挥出小模型在端侧部署上的优势，我们对照 [Octopus v2](https://huggingface.co/NexaAIDev/Octopus-v2) 的工作并使用Hare-1.1B-base替换Gemma-2B，成功在手机端实现安卓系统API调用和组合场景下的工具调用能力。
 
-**视频展示**
-
-<p>
-<iframe allowfullscreen="true" src="//player.bilibili.com/player.html?isOutside=true&aid=1955464576&bvid=BV1Ry411b7yx&cid=1573499740&p=1"></iframe>
-</p>
-
+[**视频展示**](https://www.bilibili.com/video/BV1Ry411b7yx)
 
 如您对小模型在端侧上进行工具调用感兴趣，您可以阅读我们的[技术报告](https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25)，也欢迎您与我们共同探讨和深入研究。
 
