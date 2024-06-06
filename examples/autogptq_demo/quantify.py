@@ -26,7 +26,7 @@ Note:
 2. Quantization require examples for model compression.
 
 Run this scripts for quantization:
-python quantize_model_gptq.py --original_model_path=model_to_be_quantized --quantization_model_path=quantization_model_save_path --quantization=8
+python quantify.py --original_model_path=model_to_be_quantized --quantization_model_path=quantization_model_save_path --quantization=8
 
 """
 import os

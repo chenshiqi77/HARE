@@ -1,77 +1,190 @@
-## 目录
+<div align="center">
 
-- [更新日志](#0)
-- [模型下载](#1)
-- [快速上手](#2)
-- [开源社区](#community)
-- [评测结果](#3)
-- [手机部署](#4)
-- [Demo & API 部署](#5)
-- [二次开发](#6)
-- [开源协议](#7)
-- [工作引用](#8)
-- [典型示例](#9)
+<img src="./assets/logo.jpg" width="200"/>
 
-<p id="0"></p>
+# HARE
+
+中文 ｜ [English](README.md)
+<p align="center">
+    🤗 <a href="https://huggingface.co/LiteAI-Team/Hare-1.1B-base">Hugging Face</a> | 🤖 <a href="">ModelScope</a> | 📃 <a href="https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25">Technical Report</a> 
+</p>
+<!-- | 📑 <a href="">ArXiv</a> -->
+</div>
+
+<!-- Introduction -->
+## 简介
+
+HARE 是 LiteAi 团队基于600B Tokens的开源高质量预训练数据与策略生成训练数据混合训练而成的预训练模型，模型大小仅有1.1B，并在Open LLM Leaderboard上取得不错的成绩。
+ - 我们选取 Mistral 作为基础架构，并复用其分词器，并修改模型参数使得模型大小缩小到1.1B。
+ - 我们模型遵循 Mistral 基础架构，因此，可以直接应用在许多支持 Mistral 的开源项目中，如 vLLM 等。
+ - 我们模型的参数量仅为11亿，因此，我们可以将模型部署到消费级显卡、手机端等成本较低的设备上。
+ - 我们对照 [Octopus](https://huggingface.co/NexaAIDev/Octopus-v2) 的工作，尝试并成功复现了其工作。
+ - 我们探索了FP8精度下的高效训练，并总结了一份最佳实践，希望能为开源社区LLM训练作出力所能及的贡献。
+ - 我们正在研发与适配中文。
+
+我们的源代码遵循 Apache 2.0 进行开源。对于我们的模型，由于我们仅用于学术性质的研究，因此无法保证模型生成内容的准确性，请您在使用前悉知。
+
+#### 快速导航
+
+[更新日志](#update_log) | [模型地址](#model_link) | [评测结果](#evaluation) | [快速使用](#quick_start) | [二次开发](#continue_train) | [工具调用实践](#tool_calling) 
+
+<!-- 更新日志 -->
+<p id="update_log"></p>
 
 ## 更新日志
-- **2024/04/11 开源[HARE-V-2.0](https://huggingface.co/openbmb/HARE-V-2.0)、[HARE-1.1B-128k](https://huggingface.co/openbmb/HARE-1.1B-128k)、[HARE-MoE-8x2B](https://huggingface.co/openbmb/HARE-MoE-8x2B)和[HARE-1B](https://huggingface.co/openbmb/HARE-1B-sft-bf16)！点击[这里](https://openbmb.vercel.app/?category=Chinese+Blog)查看技术博客。** 
+ - **2024-06-05 开源 [HARE-1.1B-base](https://huggingface.co/LiteAI-Team/Hare-1.1B-base)、[HARE-1.1B-chat]() 和工具调用实践 [HARE-1.1B-tool]()，您可以在[这里]()阅读我们的技术报告。**
 
-<p id="1"></p>
+<!-- 模型地址 -->
+<p id="model_link"></p>
 
-## 模型下载
+## 模型地址
 
-* 语言模型
-  注: 更多模型版本见[这里](https://huggingface.co/collections/openbmb/minicpm-2b-65d48bf958302b9fd25b698f)。
+我们的模型参数及训练细节如下：
+
+| Setting | Description |
+|:---:|:---:|
+|Size|1.1B|
+|Model structure|Mistral|
+|Model settings| Hidden size:2048, Hidden layers:22, KV heads:8, Attention heads:32|
+|Batch size|2M|
+|Training tokens| ~ 600B|
+|Training sequence length|2048|
+|Learning Rate|5e-4|
+|Hardware| 16 H800-80G GPUs|
+
+**您可以前往HuggingFace或是ModelScope下载和体验我们的模型：**
+
+|      | HuggingFace | ModelScope |
+|:-----|:--------|:-------|
+|Base|[HARE-1.1B-base](https://huggingface.co/LiteAI-Team/Hare-1.1B-base)|[HARE-1.1B-base]()|
+|Chat|[HARE-1.1B-chat]()|[HARE-1.1B-chat]()|
+|Tool demo|[HARE-1.1B-tool]()|[HARE-1.1B-tool]()|
+
+我们将在不久后开源中文版本。
+
+<!-- 评测结果 -->
+<p id="evaluation"></p>
+
+## 评测结果
+
+HARE 采取将开源高质量预训练数据和策略生成数据混合训练的方式，在有限的训练资源和少量预训练Tokens下，在Open LLM Leaderboard的轻量级模型（参数量小于2B）中，取得了优异的成绩。
+
+|Model|Size|avg|MMLU|ARC-C|TruthfulQA 0-shot|Winogrande5-shot|Hellaswag 10-shot|GSM8K 5-shot|
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+||||5-shot|25-shot|0-shot|5-shot|10-shot|5-shot|
+|phi-1_5|1.3B|47.69|43.89|52.9|40.89|72.22|63.79|12.43|
+|Qwen-1.5|1.8B|46.55|46.71|37.88|39.43|60.3|61.42|33.59| 
+|stablelm-2|1.6B|45.25|38.95|43.34|36.78|64.56|70.45|17.44| 
+|__Hare__|1.1B|40.17|35.74|38.4|42.08|59.27|57.46|8.04|
+|H2o-danube|1.8B|39.12|25.94|39.42|33.86|64.48|69.58|1.44|
+|OpenELM|1.1B|38.47|27.05|36.69|33.86|63.22|65.71|1.21|
+|csg-wukong|1B|37.78|25.33|37.71|42.79|56.67|58.93|5.23|
+|TinyLlama-3T|1.1B|36.42|26.04|33.87|37.32|59.51|60.31|1.44|
+
+同时，我们针对 benchmark 数据泄漏问题做了探索与实验，详细分析请参考我们的技术报告 [HARE](https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25) 。
+
+同样地，我们也对SFT后的模型进行评测，结果如下：
+
+|Model|Size|avg|MMLU|ARC-C|TruthfulQA 0-shot|Winogrande5-shot|Hellaswag 10-shot|GSM8K 5-shot|
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+||||5-shot|25-shot|0-shot|5-shot|10-shot|5-shot|
+|__Hare__|1.1B|40.00|33.62|37.46|41.49|58.88|53.03|15.54|
+|Qwen-1.5|1.8B|43.99|45.87|38.74|40.62|59.67|60.02|19.03| 
+|stablelm-2|1.6B|50.71|41.47|43.52|46.50|64.72|69.24|38.32|
+|TinyLlama|1.1B|36.26|26.22|33.53|36.79|60.22|59.38|1.44|
+|cosmo|1.8B|36.59|26.69|38.57|38.15|55.49|55.13|5.53|
 
 
-<p id="2"></p>
+您也可以在 [Open LLM Leaderboard](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard) 查看评测排名。
 
-## 快速上手
+<!-- 快速使用 -->
+<p id="quick_start"></p>
 
-#### 在线体验
+## 快速使用
 
-- [内网体验@金斌](https://colab.research.google.com/drive/1tJcfPyWGWA5HezO7GKLeyeIso0HyOc0l?usp=sharing)
+以下是一些使用示例，您可以参考这些代码来快速加载并体验我们的模型。
+
+在开始前，请您确保已经安装必要的依赖库：
+```Shell
+pip install -r requirements.txt
+```
+
+您也可以安装 [flash-attention](https://github.com/Dao-AILab/flash-attention) 来加速模型推理和降低显存占用。
 
 
-#### HARE-1.1B 模型调用样例
-* 安装`transformers>=4.36.0`以及`accelerate`后，运行以下代码
+### Transformers 加载和使用
+
 ```python
 import torch
-
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-
-model_path = "/lite-ai/HARE-1.1B"
+model_path = "LiteAI-Team/Hare-1.1B-base"
 tokenizer = AutoTokenizer.from_pretrained(model_path)
-model = AutoModelForCausalLM.from_pretrained(model_path).to(device)
+model = AutoModelForCausalLM.from_pretrained(model_path)
+model.to(device)
 
-prompt = """What is the tallest mountain in the world? How high is it?"""
+prompt = "Write a poem based on the landscape of Guizhou:"
 tokens = tokenizer(prompt, add_special_tokens=True, return_tensors='pt').to(device)
-output = model.generate(**tokens)
+output = model.generate(**tokens,max_new_tokens=128)
 
 output_tokens = output[0].cpu().numpy()[tokens.input_ids.size()[1]:]
 output_string = tokenizer.decode(output_tokens)
 print(output_string)
+>> """The Guizhou landscape is a sight to behold,
+A place where nature's beauty is unmatched,
+A land of towering mountains and vast plains,
+A paradise for those who seek to explore.
+
+The mountains rise high above the sky,
+A sight to beholder, a sight to see,
+The valleys stretch out as far as the eye can see,
+A landscape of endless beauty and grace."""
 ```
 
-#### 模型训练
-* 下载数据集及数据配置
+更多细节请参考[这里](./examples/hf_demo/simple_example.py)。
+
+### vLLM 加速推理
+
+因为我们沿用了 Mistral 的模型结构，因此，可以很方便的使用 vLLM 来加载我们的模型并进行推理。
+
+在模型加载前，请确保您已经安装好vLLM：
+
 ```shell
-```
-* 运行指令
-```shell
+pip install vllm
 ```
 
-#### 量化 Auto_GPTQ
-* 量化脚本
-```shell
-cd ./inference/scripts/auto_gptq
-python3 quantify.py
+```python
+from vllm import LLM, SamplingParams
+from transformers import AutoTokenizer
 
+model_path = "LiteAI-Team/Hare-1.1B-base"
+llm = LLM(model=model_path, tensor_parallel_size=4)
+
+query = "Write a poem based on the landscape of Guizhou:"
+sampling_params = SamplingParams(temperature=0.8, top_p=0.95, max_tokens=64)
+outputs = llm.generate(query, sampling_params)
+print(outputs)
 ```
-* 加载量化模型&使用脚本
+更多细节请参考[这里](./examples/vllm_demo/vllm_inference.py)。
+
+### Gradio 页面部署
+如您需要使用Gradio进行页面部署，您可参考 [gradio_demo.py](./examples/gradio_demo/gradio_demo.py) 。
+
+### GPTQ 量化
+
+我们暂未提供任何官方量化版本，如您需要量化使用我们的模型，您可以参考如下操作：
+
+* 量化
+```Shell
+pip install auto-gptq
+cd examples/autogptq_demo
+python quantify.py \
+    --original_model_path=LiteAI-Team/Hare-1.1B-base \
+    --quantization_model_path=LiteAI-Team/Hare-1.1B-base-int8 \
+    --quantization=8
+```
+* 加载量化模型 & 推理
 ```python
 import torch
 
@@ -79,12 +192,12 @@ from auto_gptq import AutoGPTQForCausalLM
 from transformers import AutoTokenizer, TextGenerationPipeline
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
-model_path = "quantized_model_path"
+model_path = "LiteAI-Team/Hare-1.1B-base"
 
 model = AutoGPTQForCausalLM.from_quantized(model_path, device=device)
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 
-query = "What is the tallest mountain in the world? How high is it?"
+query = "Write a poem based on the landscape of Guizhou:"
 # inference with model.generate
 print(tokenizer.decode(model.generate(**tokenizer(query, return_tensors="pt").to(model.device))[0]))
 
@@ -92,305 +205,131 @@ print(tokenizer.decode(model.generate(**tokenizer(query, return_tensors="pt").to
 pipeline = TextGenerationPipeline(model=model, tokenizer=tokenizer)
 print(pipeline(query)[0]["generated_text"])
 ```
+更多细节请参考[这里](./examples/autogptq_demo)。
 
-<p id="llamaformat"></p>
+### llama.cpp
+如您需要使用CPU进行部署和推理测试，我们推荐您使用 [llama.cpp](https://github.com/ggerganov/llama.cpp) 项目。
 
-
-#### vLLM 加速推理
-
-* vLLM 加速推理[vLLM](https://github.com/vllm-project/vllm)
-```shell
-pip install vllm
-```
-
-* 使用vllm进行推理
-```python
-from vllm import LLM, SamplingParams
-from transformers import AutoTokenizer
-
-model_path = "your_model_path"
-llm = LLM(model=model_path, trust_remote_code=True, tensor_parallel_size=4)
-
-query = "What is the tallest mountain in the world? How high is it?"
-sampling_params = SamplingParams(temperature=0.8, top_p=0.95, max_tokens=64)
-outputs = llm.generate(query, sampling_params)
-print(outputs)
-```
-
-* 测试输出
-```shell
-<用户>: What is the tallest mountain in the world? How high is it?
-<AI>:
- The tallest mountain on Earth is Mount Everest, which is located in the Himalayas in Nepal. It is approximately 8,848 meters (29,031 feet) tall.
-```
-
-#### llama.cpp
-1. 下载项目
-```shell
+1. clone llama.cpp 并编译
+```Shell
 git clone https://github.com/ggerganov/llama.cpp
 cd llama.cpp
-```
-2. [安装llama.cpp](https://github.com/ggerganov/llama.cpp?tab=readme-ov-file#build)
-```
 make
 ```
 
-3. 获取GUFF格式模型 
-* 下载gguf格式的模型。[下载链接-fp16格式](https://huggingface.co/runfuture/HARE-1.1B-dpo-fp16-gguf) [下载链接-q4km格式](https://huggingface.co/runfuture/HARE-1.1B-dpo-q4km-gguf)
-* SafeTensor转化为GUFF
-```
-python3 convert.py /models/safetensor-25000/
-```
-* 量化模型
-```
-./quantize /models/safetensor-25000/safetensor-25000-1B-F32.gguf /models/safetensor-25000/safetensor-25000-1B-Q8_0.gguf Q8_0
+2. 将以safetensors存储的模型转换为gguf格式
+```Shell
+python3 convert-hf-to-gguf.py models/mymodel/
 ```
 
-4. 在命令行运行对话交流模式示例代码:
-```
- ./main -m  /path/safetensor025B-26500/safetensor025B-26500-254M-F32.gguf -n 128 --color -f prompts/alpaca.txt -ins -c 2048 --temp 0.2 -n 256
-```
-更多参数调整[详见](https://github.com/ggerganov/llama.cpp/blob/master/examples/main/README.md)
-
-## fp8训练
-依赖transformer_engine镜像运行
-* 拉取镜像
-```shell
-docker pull nvcr.io/nvidia/pytorch:23.10-py3
-```
-* 启动docker
-``` 
-docker run --gpus all -it --name fp8-mistral nvcr.io/nvidia/pytorch:23.10-py3 /bin/bash
-```
-* 运行fp8训练
-```shell
-cd ./model
-deepspeed --include='localhost:0,1,2,3,4,5,6,7' --master_port 9007 train.py ./train_args/train_config_fp8.json 
+3. 量化模型
+```Shell
+./quantize ./models/mymodel/ggml-model-f16.gguf ./models/mymodel/ggml-model-Q4_K_M.gguf Q4_K_M
 ```
 
-<p id="community"></p>
-## 开源社区
+4. CPU加载量化模型 & 推理
+```Shell
+ ./main -m ./models/mymodel/ggml-model-Q4_K_M.gguf -n 128 --color -f prompts/alpaca.txt -ins -c 2048 --temp 0.2 -n 256
+ ```
 
-- [ChatLLM框架](https://github.com/foldl/chatllm.cpp)：[在CPU上跑HARE](https://huggingface.co/openbmb/HARE-1.1B-dpo-bf16/discussions/2#65c59c4f27b8c11e43fc8796)
+### 手机部署
+
+我们的模型参数量仅有1.1B，经Int4量化后，模型仅占用0.6G的空间，可轻松部署在手机端。
+
+ - **Android**：我们选择 [MLC-LLM](https://llm.mlc.ai/) 作为部署框架，在 Redmi K40 上进行 Chat 模型的部署测试。
+
+<p align="center">
+<img src="./assets/ori1_1.gif"/> <img src="./assets/ori2_2.gif"/>
+</p>
+
+ - **iOS** & **HarmonyOS**：我们将在未来对上述设备进行部署测试。
 
 
 
-<p id="3"></p>
-
-## 评测结果
-
-#### 评测设置
-
-
-#### 部署模式
-
-
-
-#### 评测度量
-
-
-
-#### 文本模型评测
-
-
-#### HARE-1.1B模型评测
-
-* 我们自己评测了正式开源的模型权重。
-
-## 手机部署
-### 部署步骤
-* 基于Linux系统，使用MLC-LL开源框架将模型部署在手机（以Android为例，参考知乎教程：https://zhuanlan.zhihu.com/p/688232510。更多端侧设备可参考MLC-LL官网（https://llm.mlc.ai/））
-1. 创建并激活python虚拟环境，建议python版本为3.10及以上。
-```
-conda create -n your-environment python==3.11
-conda activate your-environment
-```
-2. 安装Rust。
-* Rust需要将HuggingFace标记器交叉编译到Android。确保在$PATH中提供rustc、cargo和rustup
-```
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-```
-* 安装完成后，可以在命令行输入一下命令检验是否安装成功，如果没有结果，则表示安装失败，可以尝试重新安装。
-```
-rustc --version
-```
-3. 安装Android Studio进行apk的打包。
-* 在Android Studio官网中下载 ，将tar.gz文件解压到对应的目录即可。运行以下命令即可开始通过图形化界面使用Android Studio。
-```
-./bin/studio.sh
-```
-* 在 Android Studio 依次点击“File → Settings → Languages & Frameworks → Android SDK → SDK Tools”，选择安装NDK、CMake和Android SDK Platform-Tools。安装完成后，在环境变量中去对NDK等进行配置。
-* 下面是安装完毕之后需要配置的环境变量，可以执行 vim ~/.bashrc 命令，之后在最下面粘贴即下面内容即可：
-```
-export ANDROID_NDK=/home/User/Android/Sdk/ndk/27.0.11718014
-export ANDROID_HOME=/home/User/Android/Sdk
-export PATH=$PATH:/home/User/Android/Sdk/cmake/3.22.1/bin
-export PATH=$PATH:/home/User/Android/Sdk/platform-tools
-export TVM_NDK_CC=$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang
-export TVM_HOME=/home/User/mlc-llm/3rdparty/tvm  # 配置TVM Unity runtime
-export TVM_HOME=$TVM_HOME/include/tvm/runtime
-source $HOME/.cargo/env # Rust
-```
-注意：上面的路径需要和自己环境中安装的路径一致。
-
-4. 安装openjdk，官方要求的版本是>17。
-```
-# 更新update
-sudo apt update
-# 安装openjdk17
-sudo apt install openjdk-17-jdk 
-# 查看jdk17的安装路径
-sudo update-alternatives --list java
-# 用上面命令获取的路径，编入到bashrc文件的最后一行中
-vi ~/.bashrc
-# 将下面的命令，编入到bashrc文件的最后一行中
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/bin/java
-# 更新环境变量
-source ~/.bashrc
-```
-5. 安装TVM Unity compiler，用来对模型进行编译
-```
-conda activate your-environment
-python -m pip install --pre -U -f https://mlc.ai/wheels mlc-ai-nightly
-```
-* 以下命令可以帮助确认 TVM 是否已正确安装为 python 包，并提供 TVM python 包的安装位置。
-```
-python -c "import tvm; print(tvm.__file__)"
-```
-6. 安装MLC-LLM。如果安装了TVM Unity compiler后，依旧找不到mlc_llm命令，则需要安装MLC-LLM包进行编译。
-```
-	python3 -m pip install --pre -U -f https://mlc.ai/wheels mlc-llm-nightly mlc-ai-nightly
-```
-* 安装完成测试mlc_llm命令：
-```
->>> mlc_llm --help
-usage: MLC LLM Command Line Interface. [-h]{compile,convert_weight,gen_config,chat,serve,bench}
-positional arguments: {compile,convert_weight,gen_config,chat,serve,bench} Subcommand to to run. (choices: compile,convert_weight, gen_config, chat, serve, bench)
-options: -h, --help show this help message and exit
-```
-7. 编译需要部署至Android的模型，建议详细参考MLC-LLM的教程。MODEL_NAME这个变量就是你，QUANTIZATION就是默认的q4f16_1，后面的
-	MODEL_NAME=gzdx_sft  # 模型的目录名
-	QUANTIZATION=q4f16_1  # 量化方式
-```
-# convert weights
-mlc_llm convert_weight ./dist/models/$MODEL_NAME/ --quantization $QUANTIZATION -o dist/$MODEL_NAME-$QUANTIZATION-MLC/  # dist/MODEL_NAME-QUANTIZATION-MLC/是保存编译之后的文件目录名
-
-# create mlc-chat-config.json
-mlc_llm gen_config ./dist/models/$MODEL_NAME/ --quantization $QUANTIZATION --conv-template mistral_default -o dist/${MODEL_NAME}-${QUANTIZATION}-MLC/
-
-# compile: compile model library with specification in mlc-chat-config.json
-mlc_llm compile ./dist/${MODEL_NAME}-${QUANTIZATION}-MLC/mlc-chat-config.json --device android -o ./dist/${MODEL_NAME}-${QUANTIZATION}-MLC/${MODEL_NAME}-${QUANTIZATION}-android.tar
-```
-* 执行以上命令，运行完成之后在./dist/$MODEL_NAME-$QUANTIZATION-MLC这个目录下得到了所需的编译后文件。
-8. 用编译后的模型构建安卓工程。先进入目录，打开应用设置文件：
-```
-cd ./android/library
-vim ./src/main/assets/app-config.json
-```
-* 会看到有两个属性：model_list和model_lib_path_for_prepare_libs，具体介绍见MLC-LLM官网。model_lib_path_for_prepare_libs这个属性是用来获取模型对应的Model lib，也就是使用移动的GPU的编译库，对应的是刚刚获得android.tar的那个位置。这里给出很多个模型的预设，全部删掉，只重新填写自己编译的模型信息即可。完成之后，运行：
-```
-./prepare_libs.sh
-```
-会生成两个文件：
-```
->>> find ./build/output -type f
-./build/output/arm64-v8a/libtvm4j_runtime_packed.so
-./build/output/tvm4j_core.jar
-```
-9. 构建安卓应用。启动Android Studio：将./android文件作为Android studio 项目打开，将Android设备连接到虚拟机，并在手机设置的开发者模式中启用“USB 调试”。在Android Studio的菜单栏中，单击“Build → Make Project”。构建完成后，单击“Run → Run 'app'”，这时候你的手机会自动安装MLCChat这个软件。
-10. 注入权重。运行以下命令之前需要将{MODEL_NAME}和替换{QUANTIZATION}为实际模型名称（例如 gzdx_sft-q4f16_1）和量化方式（例如 q4f16_1）。
-```
-# 将apk安装进你的android手机
-adb install android/MLCChat/app/release/app-release.apk
-# 将模型权重文件上传至android手机的临时文件夹
-adb push dist/gzdx_sft-q4f16_1-MLC /data/local/tmp/gzdx_sft-q4f16_1/
-# 在android手机上创建apk读取本地模型的文件夹路径
-adb shell "mkdir -p /storage/emulated/0/Android/data/ai.mlc.mlcchat/files/"
-# 将模型拷贝至apk读取文件夹路径
-adb shell "mv /data/local/tmp/gzdx_sft-q4f16_1 /storage/emulated/0/Android/data/ai.mlc.mlcchat/files/"
-```
-如果你到这里都没有遇到错误，那么你将在可以手机上成功地运行模型了。
-
-
-
-#### 部署性能
-
-* 我们未针对手机推理模型进行深度优化和系统测试，仅验证HARE使用手机芯片进行推理的可行性。**欢迎更多开发者进一步调优并更新下面的测试列表，不断提升轻量大模型在手机上的推理性能**。
-手机测评
-* 我们也使用MLC-LLM验证了在手机上部署HARE-1.1B模型的可行性，能够正常输入输出，但也存在处理时间较长的问题，需要进一步优化，兼容性问题也需要进一步解决。下面的动图是使用小米k40 运行HARE-1.1B的屏幕录像，没有进行任何编辑。
-@吴明勇 待补充
-<table align="center">
-    <p align="center">
-      <img src="https://github.com/OpenBMB/HARE-V/blob/main/assets/gif_cases/station.gif" width=36%/>
-      <img src="https://github.com/OpenBMB/HARE-V/blob/main/assets/gif_cases/english_menu.gif" width=36%/>
-    </p>
-</table>
-
-
-<p id="5"></p>
-
-## Demo & API 部署
-
-#### 基于Gradio的网页版Demo
-@金斌补充
-* 使用如下命令启动基于Gradio的网页版demo：
-```shell
-```
-
-<p id="6"></p>
+<!-- 二次开发 -->
+<p id="continue_train"></p>
 
 ## 二次开发
-@金斌补充
+
+### 继续训练
+
+截至发布前，Hare-1.1B-base 在 [SlimPajama](https://huggingface.co/datasets/cerebras/SlimPajama-627B)、[Cosmopedia](https://huggingface.co/datasets/HuggingFaceTB/cosmopedia) 以及我们自己策略生成的数据上训练约 600B Tokens，如您想尝试继续训练，您可以参考 [pretrain](./train/pretrain/) 进行继续训练。
+
+### FP8 高效训练
+
+FP8精度训练是目前训练 LLM 的一种新兴方法，可以大幅节省显存并提升训练效率，但在开源社区中缺少相关的指导资料。我们对FP8精度高效训练做了探索和研究，将我们所遇到的问题总结出一份最佳实践，如您需要，您可以参考 [pretrain_fp8](./train/pretrain_fp8/) 进行FP8训练。
+
+### SFT
+
+#### 推理
+
+我们的 Chat 模型，在 Mistral 基础上，新增了 Special Token，并修改了默认的 chat template
+```Plaintext
+<round_start>system
+You are a helpful assistant.<round_end>
+<round_start>user
+Hello!<round_end>
+<round_start>assistant
+Hello there! What can i do for you?<round_end>
 ```
+
+您可以按照参考[这里](./examples/chat_demo/hf_chat_inference.py)体验我们发布的 [HARE-1.1B-chat]()。
+
+#### 微调
+
+我们基于 [Firefly](https://github.com/yangjianxin1/Firefly) 项目对我们的 base 模型进行微调。您可以按照如下流程对我们的模型进行微调：
+
+Step.0 **新增 Special Token**
+
+    您可以很方便的使用 transformers 中的 Tokenizer.add_tokens() 来新增 Special Token。我们为 Tokenizer 新增 <round_start> 、 <round_end> 以及为复现 [Octopus](https://huggingface.co/NexaAIDev/Octopus-v2) 工作的 <api_idx> 等 Special Token。
+
+Step.1 **注册Chat模板**
+
+您需要在 Firefly 项目的 Firefly/component/template.py 中，注册Chat模板：
+```Python
+register_template(
+    template_name='hare',
+    system_format='<round_start>system\n{content}<round_end>\n',
+    user_format='<round_start>user\n{content}<round_end>\n<round_start>assistant\n',
+    assistant_format='{content}<round_end>\n',
+    system="You are a helpful assistant.",
+    stop_word='<round_end>'
+)
 ```
-<p id="9"></p>
 
-## 典型示例
+Step.2 **开始微调**
 
-#### 文本生成
-![内容创作-case1](./assets/creation_case1.png)
+当您准备好微调数据后，即可以按照 Firefly 官方的指导对我们的模型进行微调。
 
 
-#### 代码生成
+<!-- 工具调用实践 -->
+<p id="tool_calling"></p>
 
+## 工具调用实践
 
+为完全发挥出小模型在端侧部署上的优势，我们对照 [Octopus v2](https://huggingface.co/NexaAIDev/Octopus-v2) 的工作，并成功在手机端实现安卓系统API调用和组合场景下的工具调用能力。
 
-#### 数理逻辑
-![数理逻辑-case1](./assets/math_case1.png)
+**展示视频**
 
+如您对小模型在端侧上进行工具调用感兴趣，您可以阅读我们的[技术报告]()，也欢迎您与我们共同探讨和深入研究。
 
-#### 文本翻译
-![文本翻译-case1](./assets/translate_case1.png)
+## 声明
 
+### 协议
 
-#### 指令跟随
+* 本项目中的代码依照 Apache-2.0 协议开源。
+* Hare系列模型权重目前仅对学术研究完全开放。
 
+### 声明
 
+ * Hare 是一个基于开源预训练数据和策略合成预训练数据混合训练得到的语言模型，它不具备价值判断能力，无法理解、表达个人观点，模型的输出内容不代表 LiteAI 开发团队的观点与立场。
+ * 因此，您使用 Hare 生成的内容可能存有偏观点和不实情况，请您酌情使用。
+ * 同样，我们将不承担用户故意使用 Hare 进行有害内容生成所带来的任何风险与问题。
 
-#### 特殊字符
-
-
-
-<p id="7"></p>
-
-## 开源协议
-
-#### 模型协议
-
-
-#### 声明
-
-<p id="8"></p>
-
-## 工作引用
-
-* 如果觉得HARE有助于您的工作，请引用我们的[论文](https://arxiv.org/abs/2404.06395)
-
+### 引用
+如您觉得我们的工作对您有所帮助，欢迎您引用我们的工作！
+```plaintext
 ```
-@article{hu2024minicpm,
-  title={HARE: Unveiling the Potential of Small Language Models with Scalable Training Strategies},
-  author={Hu, Shengding and Tu, Yuge and Han, Xu and He, Chaoqun and Cui, Ganqu and Long, Xiang and Zheng, Zhi and Fang, Yewei and Huang, Yuxiang and Zhao, Weilin and others},
-  journal={arXiv preprint arXiv:2404.06395},
-  year={2024}
-}
-```
+
+## 联系我们
+如果您对我们的工作有任何的意见、建议，欢迎您与我们（<chensq27@chinatelecom.cn>）联系！
