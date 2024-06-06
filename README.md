@@ -330,7 +330,7 @@ Step.2 **开始微调**
 **视频展示**
 
 <p>
-<iframe scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" src="//player.bilibili.com/player.html?isOutside=true&aid=1955464576&bvid=BV1Ry411b7yx&cid=1573499740&p=1"></iframe>
+<iframe allowfullscreen="true" src="//player.bilibili.com/player.html?isOutside=true&aid=1955464576&bvid=BV1Ry411b7yx&cid=1573499740&p=1"></iframe>
 </p>
 
 
