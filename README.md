@@ -1,10 +1,10 @@
 <div align="center">
 
-<img src="./assets/logo.jpg" width="200"/>
+<img src="./assets/logo.jpg" width="230"/>
 
 # HARE
 
-中文 ｜ [English](README.md)
+中文 ｜ [English](./README-en.md)
 <p align="center">
     🤗 <a href="https://huggingface.co/LiteAI-Team/Hare-1.1B-base">Hugging Face</a> | 🤖 <a href="">ModelScope</a> | 📃 <a href="https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25">Technical Report</a> 
 </p>
@@ -14,8 +14,8 @@
 <!-- Introduction -->
 ## 简介
 
-HARE 是 LiteAi 团队基于600B Tokens的开源高质量预训练数据与策略生成训练数据混合训练而成的预训练模型，模型大小仅有1.1B，并在Open LLM Leaderboard上取得不错的成绩。
- - 我们选取 Mistral 作为基础架构，并复用其分词器，并修改模型参数使得模型大小缩小到1.1B。
+HARE 是 LiteAI 团队基于约600B Tokens的开源高质量预训练数据与策略生成训练数据混合训练而成的预训练模型，模型大小仅有1.1B，并在Open LLM Leaderboard上取得不错的成绩。
+ - 我们选取 Mistral 作为基础架构，复用其分词器，并修改模型参数使得模型大小缩小到1.1B。
  - 我们模型遵循 Mistral 基础架构，因此，可以直接应用在许多支持 Mistral 的开源项目中，如 vLLM 等。
  - 我们模型的参数量仅为11亿，因此，我们可以将模型部署到消费级显卡、手机端等成本较低的设备上。
  - 我们对照 [Octopus](https://huggingface.co/NexaAIDev/Octopus-v2) 的工作，尝试并成功复现了其工作。
@@ -31,8 +31,9 @@ HARE 是 LiteAi 团队基于600B Tokens的开源高质量预训练数据与策�
 <!-- 更新日志 -->
 <p id="update_log"></p>
 
+<!-- TODO -->
 ## 更新日志
- - **2024-06-05 开源 [HARE-1.1B-base](https://huggingface.co/LiteAI-Team/Hare-1.1B-base)、[HARE-1.1B-chat]() 和工具调用实践 [HARE-1.1B-tool]()，您可以在[这里]()阅读我们的技术报告。**
+ - **2024-06-05 开源 [HARE-1.1B-base](https://huggingface.co/LiteAI-Team/Hare-1.1B-base)、[HARE-1.1B-chat]() 和工具调用实践 [HARE-1.1B-tool]()，您可以在[这里](https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25)阅读我们的技术报告。**
 
 <!-- 模型地址 -->
 <p id="model_link"></p>
@@ -54,13 +55,14 @@ HARE 是 LiteAi 团队基于600B Tokens的开源高质量预训练数据与策�
 
 **您可以前往HuggingFace或是ModelScope下载和体验我们的模型：**
 
+<!-- TODO -->
 |      | HuggingFace | ModelScope |
 |:-----|:--------|:-------|
 |Base|[HARE-1.1B-base](https://huggingface.co/LiteAI-Team/Hare-1.1B-base)|[HARE-1.1B-base]()|
 |Chat|[HARE-1.1B-chat]()|[HARE-1.1B-chat]()|
 |Tool demo|[HARE-1.1B-tool]()|[HARE-1.1B-tool]()|
 
-我们将在不久后开源中文版本。
+**我们将在不久后开源中文版本。**
 
 <!-- 评测结果 -->
 <p id="evaluation"></p>
@@ -238,9 +240,12 @@ python3 convert-hf-to-gguf.py models/mymodel/
 
  - **Android**：我们选择 [MLC-LLM](https://llm.mlc.ai/) 作为部署框架，在 Redmi K40 上进行 Chat 模型的部署测试。
 
-<p align="center">
-<img src="./assets/ori1_1.gif"/> <img src="./assets/ori2_2.gif"/>
-</p>
+<table align="center">
+    <p align="center">
+      <img src="./assets/ori1_1.gif"/>
+      <img src="./assets/ori2_2.gif"/>
+    </p>
+</table>
 
  - **iOS** & **HarmonyOS**：我们将在未来对上述设备进行部署测试。
 
@@ -272,7 +277,7 @@ Hello!<round_end>
 <round_start>assistant
 Hello there! What can i do for you?<round_end>
 ```
-
+<!-- TODO -->
 您可以按照参考[这里](./examples/chat_demo/hf_chat_inference.py)体验我们发布的 [HARE-1.1B-chat]()。
 
 #### 微调
@@ -281,7 +286,7 @@ Hello there! What can i do for you?<round_end>
 
 Step.0 **新增 Special Token**
 
-    您可以很方便的使用 transformers 中的 Tokenizer.add_tokens() 来新增 Special Token。我们为 Tokenizer 新增 <round_start> 、 <round_end> 以及为复现 [Octopus](https://huggingface.co/NexaAIDev/Octopus-v2) 工作的 <api_idx> 等 Special Token。
+您可以很方便的使用 transformers 中的 Tokenizer.add_tokens() 来新增 Special Token。我们为 Tokenizer 新增 <round_start> 、 <round_end> 以及为复现 [Octopus](https://huggingface.co/NexaAIDev/Octopus-v2) 工作的 <api_idx> 等 Special Token。
 
 Step.1 **注册Chat模板**
 
@@ -299,7 +304,7 @@ register_template(
 
 Step.2 **开始微调**
 
-当您准备好微调数据后，即可以按照 Firefly 官方的指导对我们的模型进行微调。
+当您准备好微调数据后，即可按照 Firefly 官方的指导对我们的模型进行微调。
 
 
 <!-- 工具调用实践 -->
@@ -311,7 +316,7 @@ Step.2 **开始微调**
 
 **展示视频**
 
-如您对小模型在端侧上进行工具调用感兴趣，您可以阅读我们的[技术报告]()，也欢迎您与我们共同探讨和深入研究。
+如您对小模型在端侧上进行工具调用感兴趣，您可以阅读我们的[技术报告](https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25)，也欢迎您与我们共同探讨和深入研究。
 
 ## 声明
 
