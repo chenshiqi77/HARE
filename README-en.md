@@ -330,7 +330,19 @@ When you are ready to fine-tune the data, you can follow the official guidance o
 In order to fully utilize the advantages of small models in terminal deployment, we compared the work of [Octopus v2](https://huggingface.co/NexaAIDev/Octopus-v2) and successfully implemented the Android system API call and tool call capabilities in combined scenarios on the mobile phone.
 
 **Show Video**
-<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=1955464576&bvid=BV1Ry411b7yx&cid=1573499740&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
+<iframe  
+    width="100%"  
+    height="450"  
+    src="//player.bilibili.com/player.html?isOutside=true&aid=1955464576&bvid=BV1Ry411b7yx&cid=1573499740&p=1"  
+    scrolling="no"  
+    border="0"  
+    frameborder="no"  
+    framespacing="0"  
+    allowfullscreen="true">
+video
+</iframe> 
+
 
 
 If you are interested in tool calls for small models on the terminal, you can read our [Technical Report](https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25), and you are also welcome to discuss and study with us.
