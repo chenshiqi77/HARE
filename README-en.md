@@ -6,7 +6,7 @@
 
 [中文](./README.md) ｜ English
 <p align="center">
-    🤗 <a href="https://huggingface.co/LiteAI-Team/Hare-1.1B-base">Hugging Face</a> | 🤖 <a href="">ModelScope</a> | 📃 <a href="https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25">Technical Report</a> 
+    🤗 <a href="https://huggingface.co/LiteAI-Team/Hare-1.1B-base">Hugging Face</a> | 🤖 <a href="https://modelscope.cn/models/LiteAITeam/Hare-1.1B-base">ModelScope</a> | 📃 <a href="https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25">Technical Report</a> 
 </p>
 <!-- | 📑 <a href="">ArXiv</a> -->
 </div>
@@ -14,7 +14,7 @@
 <!-- Introduction -->
 ## Introduction
 
-HARE is a pre-trained model trained by the LiteAI team based on a mixture of open source high-quality pre-trained data of about 600B Tokens and strategy-generated training data. The model size is only 1.1B and has achieved good results on the Open LLM Leaderboard.
+HARE is a pre training model developed by the LiteAI team of China Telecom Guizhou Branch. We use high-quality open-source and strategy generated synthetic data of approximately 600B tokens as pre training data. The model size is only 1.1B and has achieved good results on the Open LLM Leaderboard.
 - We selected Mistral as the infrastructure, reused its word segmenter, and modified the model parameters to reduce the model size to 1.1B.
 - Our model follows the Mistral infrastructure, so it can be directly applied to many open source projects that support Mistral, such as vLLM.
 - The number of parameters of our model is only 1.1 billion, so we can deploy the model on low-cost devices such as consumer graphics cards and mobile phones.
@@ -27,7 +27,7 @@ Our source code is open sourced under Apache 2.0. As our model is only used for 
 
 #### Quick Navigation
 
-[Update log](#update_log) | [Model link](#model_link) | [Evaluation](#evaluation) | [Quick start](#quick_start) | [Continue train](#continue_train) | [Tool calling](#tool_calling) 
+[Update log](#update_log) | [Model link](#model_link) | [Evaluation](#evaluation) | [Quick start](#quick_start) | [Continue train](#continue_train) | [Tool calling](#tool_calling) | [Contact us](#contact_us) 
 
 <!-- 更新日志 -->
 <p id="update_log"></p>
@@ -57,7 +57,7 @@ Our model parameters and training details are as follows:
 <!-- TODO -->
 |      | HuggingFace | ModelScope |
 |:-----|:--------|:-------|
-|Base|[HARE-1.1B-base](https://huggingface.co/LiteAI-Team/Hare-1.1B-base)|[HARE-1.1B-base]()|
+|Base|[HARE-1.1B-base](https://huggingface.co/LiteAI-Team/Hare-1.1B-base)|[HARE-1.1B-base](https://modelscope.cn/models/LiteAITeam/Hare-1.1B-base)|
 |Chat|[HARE-1.1B-chat]()|[HARE-1.1B-chat]()|
 |Tool demo|[HARE-1.1B-tool]()|[HARE-1.1B-tool]()|
 
@@ -110,7 +110,7 @@ Before starting, please make sure that you have installed the necessary dependen
 pip install -r requirements.txt
 ```
 
-You can also install [flash-attention](https://github.com/Dao-AILab/flash-attention) to speed up model reasoning and reduce video memory usage.
+You can also install [flash-attention](https://github.com/Dao-AILab/flash-attention) to speed up model reasoning and reduce GPU memory usage.
 
 
 ### Transformers Loading And Use
@@ -171,6 +171,22 @@ For more details, please refer to [here](./examples/vllm_demo/vllm_inference.py)
 
 ### Gradio Page Deployment
 If you need to use Gradio for page deployment, you can refer to [gradio_demo.py](./examples/gradio_demo/gradio_demo.py).
+
+Before running, make sure you have installed all required libs:
+```Shell
+pip install fastapi
+pip install uvicorn
+pip install gradio
+```
+
+Then, you can initailize the Web UI:
+```Shell
+cd examples/gradio_demo
+uvicorn gradio_demo:app --host 0.0.0.0 --port 4999
+```
+
+Now, you can try our model on http://0.0.0.0:4999/gradio/
+
 
 ### GPTQ Quantization
 
@@ -314,6 +330,8 @@ When you are ready to fine-tune the data, you can follow the official guidance o
 In order to fully utilize the advantages of small models in terminal deployment, we compared the work of [Octopus v2](https://huggingface.co/NexaAIDev/Octopus-v2) and successfully implemented the Android system API call and tool call capabilities in combined scenarios on the mobile phone.
 
 **Show Video**
+<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=1955464576&bvid=BV1Ry411b7yx&cid=1573499740&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
 
 If you are interested in tool calls for small models on the terminal, you can read our [Technical Report](https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25), and you are also welcome to discuss and study with us.
 
@@ -334,6 +352,9 @@ If you are interested in tool calls for small models on the terminal, you can re
 If you think our work is helpful to you, you are welcome to cite our work!
 ```plaintext
 ```
+
+<!-- 二次开发 -->
+<p id="contact_us"></p>
 
 ## Contact us
 If you have any comments or suggestions on our work, you are welcome to contact us (<chensq27@chinatelecom.cn>)!
