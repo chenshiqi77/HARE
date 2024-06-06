@@ -281,7 +281,7 @@ You can refer to [here](./examples/chat_demo/hf_chat_inference.py) to experience
 
 #### Fine-tuning
 
-我们基于 [Firefly](https://github.com/yangjianxin1/Firefly) 项目对我们的 base 模型进行微调。您可以按照如下流程对我们的模型进行微调：
+We fine-tune our base model based on the [Firefly](https://github.com/yangjianxin1/Firefly) project. You can fine-tune our model according to the following process:
 
 Step.0 **Add Special Token**
 
