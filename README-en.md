@@ -277,7 +277,7 @@ As of the release date, Hare-1.1B-base has trained about 600B tokens on data gen
 
 ### FP8 Efficient Training
 
-FP8 precision training is an emerging method for training LLM, which can greatly save video memory and improve training efficiency, but there is a lack of relevant guidance materials in the open source community. We have explored and studied FP8 precision efficient training and summarized the problems we encountered into a best practice. If you need, you can refer to [pretrain_fp8](./train/pretrain_fp8/) for FP8 training.
+FP8 precision training is an emerging method for training LLM, which can greatly save GPU memory and improve training efficiency, but there is a lack of relevant guidance materials in the open source community. We have explored and studied FP8 precision efficient training and summarized the problems we encountered into a best practice. If you need, you can refer to [pretrain_fp8](./train/pretrain_fp8/) for FP8 training.
 
 ### SFT
 
