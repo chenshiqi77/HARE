@@ -6,7 +6,7 @@
 
 中文 ｜ [English](./README-en.md)
 <p align="center">
-    🤗 <a href="https://huggingface.co/LiteAI-Team/Hare-1.1B-base">Hugging Face</a> | 🤖 <a href="">ModelScope</a> | 📃 <a href="https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25">Technical Report</a> 
+    🤗 <a href="https://huggingface.co/LiteAI-Team/Hare-1.1B-base">Hugging Face</a> | 🤖 <a href="https://modelscope.cn/models/LiteAITeam/Hare-1.1B-base">ModelScope</a> | 📃 <a href="https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25">Technical Report</a> 
 </p>
 <!-- | 📑 <a href="">ArXiv</a> -->
 </div>
@@ -14,7 +14,7 @@
 <!-- Introduction -->
 ## 简介
 
-HARE 是 LiteAI 团队基于约600B Tokens的开源高质量预训练数据与策略生成训练数据混合训练而成的预训练模型，模型大小仅有1.1B，并在Open LLM Leaderboard上取得不错的成绩。
+HARE 是由中国电信股份有限公司贵州分公司 LiteAI 团队开发的预训练模型，我们使用600B Tokens的高质量开源和策略生成的合成数据作为预训练数据。模型大小仅有1.1B，并在Open LLM Leaderboard上取得不错的成绩。
  - 我们选取 Mistral 作为基础架构，复用其分词器，并修改模型参数使得模型大小缩小到1.1B。
  - 我们模型遵循 Mistral 基础架构，因此，可以直接应用在许多支持 Mistral 的开源项目中，如 vLLM 等。
  - 我们模型的参数量仅为11亿，因此，我们可以将模型部署到消费级显卡、手机端等成本较低的设备上。
@@ -26,7 +26,7 @@ HARE 是 LiteAI 团队基于约600B Tokens的开源高质量预训练数据与�
 
 #### 快速导航
 
-[更新日志](#update_log) | [模型地址](#model_link) | [评测结果](#evaluation) | [快速使用](#quick_start) | [二次开发](#continue_train) | [工具调用实践](#tool_calling) 
+[更新日志](#update_log) | [模型地址](#model_link) | [评测结果](#evaluation) | [快速使用](#quick_start) | [二次开发](#continue_train) | [工具调用实践](#tool_calling) | [联系我们](#contact_us) 
 
 <!-- 更新日志 -->
 <p id="update_log"></p>
@@ -58,7 +58,7 @@ HARE 是 LiteAI 团队基于约600B Tokens的开源高质量预训练数据与�
 <!-- TODO -->
 |      | HuggingFace | ModelScope |
 |:-----|:--------|:-------|
-|Base|[HARE-1.1B-base](https://huggingface.co/LiteAI-Team/Hare-1.1B-base)|[HARE-1.1B-base]()|
+|Base|[HARE-1.1B-base](https://huggingface.co/LiteAI-Team/Hare-1.1B-base)|[HARE-1.1B-base](https://modelscope.cn/models/LiteAITeam/Hare-1.1B-base)|
 |Chat|[HARE-1.1B-chat]()|[HARE-1.1B-chat]()|
 |Tool demo|[HARE-1.1B-tool]()|[HARE-1.1B-tool]()|
 
@@ -144,8 +144,6 @@ The valleys stretch out as far as the eye can see,
 A landscape of endless beauty and grace."""
 ```
 
-更多细节请参考[这里](./examples/hf_demo/simple_example.py)。
-
 ### vLLM 加速推理
 
 因为我们沿用了 Mistral 的模型结构，因此，可以很方便的使用 vLLM 来加载我们的模型并进行推理。
@@ -168,10 +166,25 @@ sampling_params = SamplingParams(temperature=0.8, top_p=0.95, max_tokens=64)
 outputs = llm.generate(query, sampling_params)
 print(outputs)
 ```
-更多细节请参考[这里](./examples/vllm_demo/vllm_inference.py)。
 
 ### Gradio 页面部署
 如您需要使用Gradio进行页面部署，您可参考 [gradio_demo.py](./examples/gradio_demo/gradio_demo.py) 。
+
+在运行前，请确保您安装好相关依赖：
+```Shell
+pip install fastapi
+pip install uvicorn
+pip install gradio
+```
+
+您可以参考以下代码启动 Web UI：
+```Shell
+cd examples/gradio_demo
+uvicorn gradio_demo:app --host 0.0.0.0 --port 4999
+```
+
+等待服务启动，即可访问 http://0.0.0.0:4999/gradio/ 体验 Web UI
+
 
 ### GPTQ 量化
 
@@ -262,7 +275,7 @@ python3 convert-hf-to-gguf.py models/mymodel/
 
 ### FP8 高效训练
 
-FP8精度训练是目前训练 LLM 的一种新兴方法，可以大幅节省显存并提升训练效率，但在开源社区中缺少相关的指导资料。我们对FP8精度高效训练做了探索和研究，将我们所遇到的问题总结出一份最佳实践，如您需要，您可以参考 [pretrain_fp8](./train/pretrain_fp8/) 进行FP8训练。
+FP8精度训练是目前训练 LLM 的一种新兴方法，可以大幅节省显存并提升训练效率，但在开源社区中缺少相关的指导资料。我们对FP8精度高效训练做了探索和研究，将我们所遇到的问题总结出一份最佳实践，如您需要，您可以参考 [pretrain_fp8](./train/pretrain_fp8/) 进行FP8训练，参考 [fp8_inference.py](./examples/fp8_inference_demo/fp8_inference.py) 进行FP8推理。
 
 ### SFT
 
@@ -312,9 +325,12 @@ Step.2 **开始微调**
 
 ## 工具调用实践
 
-为完全发挥出小模型在端侧部署上的优势，我们对照 [Octopus v2](https://huggingface.co/NexaAIDev/Octopus-v2) 的工作，并成功在手机端实现安卓系统API调用和组合场景下的工具调用能力。
+为完全发挥出小模型在端侧部署上的优势，我们对照 [Octopus v2](https://huggingface.co/NexaAIDev/Octopus-v2) 的工作并使用Hare-1.1B-base替换Gemma-2B，成功在手机端实现安卓系统API调用和组合场景下的工具调用能力。
 
-**展示视频**
+**视频展示**
+<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=1955464576&bvid=BV1Ry411b7yx&cid=1573499740&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
+
 
 如您对小模型在端侧上进行工具调用感兴趣，您可以阅读我们的[技术报告](https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25)，也欢迎您与我们共同探讨和深入研究。
 
@@ -335,6 +351,9 @@ Step.2 **开始微调**
 如您觉得我们的工作对您有所帮助，欢迎您引用我们的工作！
 ```plaintext
 ```
+
+<!-- 联系我们 -->
+<p id="contact_us"></p>
 
 ## 联系我们
 如果您对我们的工作有任何的意见、建议，欢迎您与我们（<chensq27@chinatelecom.cn>）联系！

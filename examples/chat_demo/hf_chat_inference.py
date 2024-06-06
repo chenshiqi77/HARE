@@ -1,5 +1,9 @@
-import time
+# coding=utf-8
+
+import torch
+
 from transformers import GenerationConfig
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 def chat(
     messages,
@@ -63,6 +67,13 @@ def chat(
 #       main
 # ======================
 if __name__ == "__main__":
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model_path = "LiteAI-Team/Hare-1.1B-chat"
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    model = AutoModelForCausalLM.from_pretrained(model_path)
+    model.to(device)
+
     query = "Hello!"
     messages = [
         # {"role": "system", "content": "You are an AI assistant, aiming to always upholding high standards of performance and quality."},
