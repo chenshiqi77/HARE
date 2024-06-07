@@ -332,7 +332,7 @@ After collected your SFT data, you can follow the official guidance of Firefly t
 
 To fully leverage the advantages of SLMs on end-user devices, we followde the work of [Octopus v2](https://huggingface.co/NexaAIDev/Octopus-v2). Successfully implemented Android system API calls and tool invocation capabilities in combination scenarios on the mobile by replacing Gemma-2B with our Hare-1.1B-base.
 
-**See Demo**(https://www.bilibili.com/video/BV1Ry411b7yx)
+[**See Demo**](https://www.bilibili.com/video/BV1Ry411b7yx)
 
 If you are interested in tool calls for SLMs on end-user devices, you can read our [Technical Report](https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25), and you are also welcome to contact us in academic study.
 
