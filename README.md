@@ -191,6 +191,7 @@ uvicorn gradio_demo:app --host 0.0.0.0 --port 4999
 我们暂未提供任何官方量化版本，如您需要量化使用我们的模型，您可以参考如下操作：
 
 * 量化
+
 ```Shell
 pip install auto-gptq
 cd examples/autogptq_demo
@@ -199,7 +200,9 @@ python quantify.py \
     --quantization_model_path=LiteAI-Team/Hare-1.1B-base-int8 \
     --quantization=8
 ```
+
 * 加载量化模型 & 推理
+
 ```python
 import torch
 
