@@ -10,10 +10,10 @@
         "stage3_gather_16bit_weights_on_model_save": true
     },
     "bf16": {
-        "enabled": false
+        "enabled": true
     },
     "fp16": {
-        "enabled": true
+        "enabled": false
     },
     "zero_allow_untested_optimizer":true,
     "msamp": {

@@ -2,8 +2,8 @@
 # Copyright 2024 Lite-AI and the HuggingFace Inc. team. All rights reserved.
 #
 # This code is based on MistralForCausalLM from transformers.
-# It has been modified from its original forms to accommodate 
-# minor architectural differences compared to 
+# It has been modified from its original forms to accommodate
+# minor architectural differences compared to
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,12 +26,13 @@ import torch
 import logging
 from tqdm.auto import tqdm
 import os
-import argparse
 from torch.utils.tensorboard import SummaryWriter
 from typing import Union
 from transformers.modeling_utils import PreTrainedModel
 from torch import nn
 from .dataloader import GetData
+import transformer_engine.pytorch as te
+from transformer_engine.common import recipe
 
 
 class AverageLoss:
@@ -68,6 +69,7 @@ class MyTrainer:
         deepspeed_config,
         max_saving_checkpoints,
         args,
+        model_config,
         model: Union[PreTrainedModel, nn.Module] = None,
         resume: bool = False,
         resume_model_path: str = None,
@@ -88,7 +90,6 @@ class MyTrainer:
         self.lr_scheduler_type = lr_scheduler_type
         self.warmup_proportion = warmup_proportion
         self.num_grad_accum_steps = num_grad_accum_steps
-        self.use_deepspeed = use_deepspeed
         self.deepspeed_config = deepspeed_config
         self.use_tensorboard = use_tensorboard
         self.log_path = log_path
@@ -96,6 +97,8 @@ class MyTrainer:
         self.model_output_path = model_output_path
         self.resume_model_path = resume_model_path
         self.tokenizer = tokenizer
+        self.args = args
+        self.model_config = model_config
 
         if self.use_tensorboard:
             assert (
@@ -104,6 +107,13 @@ class MyTrainer:
             self.summary = SummaryWriter(os.path.join(self.log_path, "runs"))
 
         self.training_data = GetData(self.train_data, self.tokenizer, 0)
+        self.deepspeed_config.update(
+            **{
+                "train_micro_batch_size_per_gpu": self.per_device_train_batch_size,
+                "gradient_accumulation_steps": self.num_grad_accum_steps,
+                "gradient_clipping": 1,
+            }
+        )
 
     def get_log(self):
         log = logging.getLogger()
@@ -122,7 +132,7 @@ class MyTrainer:
             train_data, seed=self.seed, num_replicas=None, rank=None
         )
         distributed_dataloader = DataLoader(
-            self.train_data,
+            train_data,
             batch_size=self.per_device_train_batch_size,
             sampler=sampler,
         )
@@ -157,14 +167,6 @@ class MyTrainer:
             filter(lambda p: p.requires_grad, self.model.parameters())
         )
 
-        self.deepspeed_config.update(
-            **{
-                "train_micro_batch_size_per_gpu": self.per_device_train_batch_size,
-                "gradient_accumulation_steps": self.num_grad_accum_steps,
-                "gradient_clipping": 1,
-            }
-        )
-
         model_engine, optimizer, _, lr_scheduler = deepspeed.initialize(
             model=self.model,
             model_parameters=model_parameters,
@@ -174,59 +176,48 @@ class MyTrainer:
         )
         return distributed_dataloader, model_engine, sampler
 
-    def parse_args(self):
-        parser = argparse.ArgumentParser(description="Distilling a transformers model.")
-        parser.add_argument(
-            "--local_rank",
-            type=int,
-            default=-1,
-            help="Local rank for distributed training.",
-        )
-        args = parser.parse_args()
-        return args
-    
     def train(self):
-        args = self.parse_args()
-
+        fp8_recipe = recipe.DelayedScaling(
+            margin=0, interval=1, fp8_format=recipe.Format.HYBRID
+        )
+        fp8_recipe.reduce_amax = False
         log = self.get_log()
+        torch.cuda.set_device(self.args.local_rank)
+        deepspeed.init_distributed()
 
-        if args.local_rank == -1:
-            device = torch.device("cuda")
-        else:
-            torch.cuda.set_device(args.local_rank)
-            device = torch.device("cuda", args.local_rank)
-            deepspeed.init_distributed()
+        self.args.global_rank = torch.distributed.get_rank()
+        main_process = self.args.global_rank == 0
 
-        args.global_rank = torch.distributed.get_rank()
-        main_process = args.global_rank == 0
+        distributed_dataloader, model_engine, sampler = self.init_deepspeed(
+            self.training_data
+        )
 
         if self.resume:
             assert (
                 self.resume_model_path is not None
             ), "You must provide a checkpoint path which is needed to be resumed."
-            load_path, _ = model_engine.load_checkpoint(
+            model_engine.load_checkpoint(
                 self.resume_model_path,
                 load_optimizer_states=True,
                 load_lr_scheduler_states=True,
             )
-            previous_step = int(os.path.basename(args.resume_model_path).split("-")[1])
+            previous_step = int(
+                os.path.basename(self.args.resume_model_path).split("-")[1]
+            )
             all_step = previous_step
-            start_step = (all_step - 1) * 4
+            start_step = (all_step - 1) * self.num_grad_accum_steps
             self.training_data = GetData(self.train_data, self.tokenizer, previous_step)
         else:
             all_step = 0
             start_step = 0
 
-        if self.use_deepspeed:
-            distributed_dataloader, model_engine, sampler = self.init_deepspeed(
-                self.training_data
-            )
-            total_batch_size = (
-                self.per_device_train_batch_size
-                * self.num_grad_accum_steps
-                * dist.get_world_size()
-            )
-            num_train_steps = self.num_train_epochs * self.num_update_steps_per_epoch
+        total_batch_size = (
+            self.per_device_train_batch_size
+            * self.num_grad_accum_steps
+            * dist.get_world_size()
+        )
+
+        num_train_steps = self.num_train_epochs * self.num_update_steps_per_epoch
 
         if torch.distributed.get_rank() == 0:
             log.info("***** Running training *****")
@@ -248,16 +239,17 @@ class MyTrainer:
         for epoch in range(self.num_train_epochs):
             sampler.set_epoch(epoch)
             for step, batch in enumerate(distributed_dataloader, start=start_step):
-                model_engine.train()
-                s_output = model_engine(**batch)
-                loss = s_output[0]
-                loss_ = loss.detach().clone()
-                dist.all_reduce(loss_, op=dist.ReduceOp.SUM)
-                train_losses.update(loss_.item() / dist.get_world_size())
-                loss = loss / self.num_grad_accum_steps
-                model_engine.backward(loss)
-                torch.cuda.synchronize()
-                model_engine.step()
+                with te.fp8_autocast(enabled=True, fp8_recipe=fp8_recipe):
+                    model_engine.train()
+                    s_output = model_engine(**batch)
+                    loss = s_output[0]
+                    loss_ = loss.detach().clone()
+                    dist.all_reduce(loss_, op=dist.ReduceOp.SUM)
+                    train_losses.update(loss_.item() / dist.get_world_size())
+                    loss = loss / self.num_grad_accum_steps
+                    model_engine.backward(loss)
+                    torch.cuda.synchronize()
+                    model_engine.step()
                 if (
                     step % self.num_grad_accum_steps == 0
                     or step == len(distributed_dataloader) - 1
@@ -275,24 +267,21 @@ class MyTrainer:
                         self.summary.add_scalar("lr/train", lr[0], all_step)
                     if saving_steps != 0 and all_step % saving_steps == 0:
                         log.info("*************** saving checkpoint... ***************")
-                        save_dir = os.path.join(
-                            self.model_output_path, f"checkpoint-{all_step}"
-                        )
-                        os.makedirs(save_dir, exist_ok=True)
-                        model_engine.save_checkpoint(save_dir)
-                        state_dict = model_engine.module.state_dict()
-                        torch.save(
-                            state_dict, os.path.join(save_dir, "pytorch_model.bin")
-                        )
+                        self.save_model(model_engine, all_step)
                     if main_process:
                         print(
                             f"epoch:{epoch+1}, step:{step}, all_step:{all_step}, total_loss: {train_losses.average}, lr: {lr[0]}"
                         )
             model_engine.tput_timer.update_epoch_count()
+        self.save_model(model_engine, "last")
+
+    def save_model(self, model_engine, all_step):
+        save_dir = os.path.join(self.model_output_path, f"checkpoint-{all_step}")
+        os.makedirs(save_dir, exist_ok=True)
+        model_engine.save_checkpoint(save_dir)
+        self.model_config.save_pretrained(save_dir)
         state_dict = model_engine.module.state_dict()
-        last_dir = os.path.join(self.model_output_path, "checkpoint-last")
-        os.makedirs(last_dir, exist_ok=True)
-        model_engine.save_checkpoint(last_dir)
+        torch.save(state_dict, os.path.join(save_dir, "pytorch_model.bin"))
 
     def get_optimizer_grouped_parameters(self, model, weight_decay):
         no_decay_name_list = [

@@ -2,7 +2,7 @@
 # Copyright 2024 Lite-AI Inc. team. All rights reserved.
 #
 # This code is based on MistralForCausalLM from transformers.
-# It has been modified from its original forms to accommodate 
+# It has been modified from its original forms to accommodate
 # minor architectural differences compared to.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,22 +18,28 @@
 # limitations under the License.
 
 import argparse
-from transformers import AutoTokenizer, HfArgumentParser, TrainingArguments
+from transformers import AutoTokenizer, HfArgumentParser, TrainingArguments, AutoConfig
 from utils.argument import CustomizedArguments
 from utils.trainer import MyTrainer
 from datasets import load_dataset
 from deepspeed.ops.adam import FusedAdam
 import json
 from mistral.modeling_mistral_fp8 import MistralForCausalLM
-# from mistral.modeling_mistral_fp8_trans import MistralForCausalLM
+
 
 def set_args():
     args_parse = argparse.ArgumentParser()
     args_parse.add_argument(
         "--train_args_file",
         type=str,
-        default="train_args/train_config.json",
+        default="./train_args/train_config fp8.json",
         help="",
+    )
+    args_parse.add_argument(
+        "--local_rank",
+        type=int,
+        default=-1,
+        help="Local rank for distributed training.",
     )
     parse_args = args_parse.parse_args()
     parser = HfArgumentParser((CustomizedArguments, TrainingArguments))
@@ -43,15 +49,14 @@ def set_args():
         setattr(cust_args, attr, value)
     return cust_args
 
+
 def main():
     args = set_args()
 
     model_path = args.model_name_or_path
     data_path = args.data_path
-
- 
-
-    model = MistralForCausalLM.from_pretrained(model_path, trust_remote_code=True)
+    config = AutoConfig.from_pretrained(model_path)
+    model = MistralForCausalLM.from_pretrained(model_path, config=config)
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     data = load_dataset(data_path, split="train", cache_dir="cachedir")
 
@@ -77,10 +82,12 @@ def main():
         model_output_path=args.output_dir,
         args=args,
         resume=args.resume,
-        resume_model_path=args.resume_model_path
+        resume_model_path=args.resume_model_path,
+        model_config=config,
     )
 
     train_object.train()
+
 
 if __name__ == "__main__":
     main()
