@@ -4,6 +4,7 @@ import torch
 import transformer_engine.pytorch as te
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformer_engine.common import recipe
 
 # ======================
 #       main
@@ -21,11 +22,11 @@ if __name__ == "__main__":
     model = AutoModelForCausalLM.from_pretrained(model_path).to(device)
 
     prompt = "Write a poem based on the landscape of Guizhou:"
-    tokens = tokenizer(prompt, add_special_tokens=True, return_tensors='pt').to(device)
+    tokens = tokenizer(prompt, add_special_tokens=True, return_tensors="pt").to(device)
 
     with te.fp8_autocast(enabled=True, fp8_recipe=fp8_recipe):
         output = model.generate(**tokens)
 
-    output_tokens = output[0].cpu().numpy()[tokens.input_ids.size()[1]:]
+    output_tokens = output[0].cpu().numpy()[tokens.input_ids.size()[1] :]
     output_string = tokenizer.decode(output_tokens)
     print(output_string)

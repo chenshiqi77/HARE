@@ -281,7 +281,13 @@ class MyTrainer:
         model_engine.save_checkpoint(save_dir)
         self.model_config.save_pretrained(save_dir)
         state_dict = model_engine.module.state_dict()
-        torch.save(state_dict, os.path.join(save_dir, "pytorch_model.bin"))
+        self.tokenizer.save_pretrained(save_dir)
+        save_dict = {}
+        for k, v in state_dict.items():
+            if not isinstance(v, torch.Tensor):
+                continue
+            save_dict[k] = v
+        torch.save(save_dict, os.path.join(save_dir, "pytorch_model.bin"))
 
     def get_optimizer_grouped_parameters(self, model, weight_decay):
         no_decay_name_list = [

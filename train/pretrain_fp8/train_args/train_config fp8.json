@@ -1,8 +1,8 @@
 {
-    "model_name_or_path": "/ggj/github/New/HARE/LiteAI/HARE",
+    "model_name_or_path": "/home/mutil/train_model/checkpoint-113",
     "deepspeed": "./train_args/ds_config.json",
     "data_config": "./train_args/data_info.ini",
-    "data_path": "/ggj/github/New/HARE/test",
+    "data_path": "/HARE/test",
     "train_file": "",
     "per_device_eval_batch_size": 64,
     "gradient_clipping": 1.0,
@@ -38,6 +38,6 @@
     "dataloader_num_workers": 0,
     "save_strategy": "steps",
     "max_grad_norm": 1.0,
-    "train_dype": "fp16",
+    "train_dype": "fp8",
     "remove_unused_columns": false
 }
