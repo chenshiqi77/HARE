@@ -33,7 +33,7 @@ HARE 是由中国电信股份有限公司贵州分公司 LiteAI 团队开发的�
 
 <!-- TODO -->
 ## 更新日志
- - **2024-06-05 开源 [HARE-1.1B-base](https://huggingface.co/LiteAI-Team/Hare-1.1B-base)、[HARE-1.1B-chat]() 和工具调用实践 [HARE-1.1B-tool]()，您可以在[这里](https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25)阅读我们的技术报告。**
+ - **2024-06-05 开源 [HARE-1.1B-base](https://huggingface.co/LiteAI-Team/Hare-1.1B-base)、[HARE-1.1B-chat](https://huggingface.co/LiteAI/Hare-1.1B-Chat) 和工具调用实践 [HARE-1.1B-tool](https://huggingface.co/LiteAI/Hare-1.1B-Tool)，您可以在[这里](https://liteai-team.notion.site/HARE-HumAn-pRiors-a-key-to-small-language-model-Efficiency-a285280a3c61491ab142cc718f84aa7d?pvs=25)阅读我们的技术报告。**
 
 <!-- 模型地址 -->
 <p id="model_link"></p>
@@ -53,14 +53,14 @@ HARE 是由中国电信股份有限公司贵州分公司 LiteAI 团队开发的�
 |Learning Rate|5e-4|
 |Hardware| 16 H800-80G GPUs|
 
-**您可以前往HuggingFace或是ModelScope下载和体验我们的模型：**
+**您可以前往HuggingFace或是ModelScope下载和体验我们的模型**
 
 <!-- TODO -->
 |      | HuggingFace | ModelScope |
 |:-----|:--------|:-------|
 |Base|[HARE-1.1B-base](https://huggingface.co/LiteAI-Team/Hare-1.1B-base)|[HARE-1.1B-base](https://modelscope.cn/models/LiteAITeam/Hare-1.1B-base)|
-|Chat|[HARE-1.1B-chat]()|[HARE-1.1B-chat]()|
-|Tool demo|[HARE-1.1B-tool]()|[HARE-1.1B-tool]()|
+|Chat|[HARE-1.1B-chat](https://huggingface.co/LiteAI/Hare-1.1B-Chat)|[HARE-1.1B-chat]()|
+|Tool demo|[HARE-1.1B-tool](https://huggingface.co/LiteAI/Hare-1.1B-Tool)|[HARE-1.1B-tool]()|
 
 **我们将在不久后开源中文版本。**
 

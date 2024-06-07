@@ -1,9 +1,20 @@
+"""
+Author: gegaojian c1549533775@163.com
+Date: 2024-06-06 18:58:24
+LastEditors: gegaojian c1549533775@163.com
+LastEditTime: 2024-06-06 21:06:06
+FilePath: /HARE/train/pretrain/utils/dataloader.py
+Description: 
+
+Copyright (c) 2024 by ${git_name_email}, All Rights Reserved. 
+"""
+
 # coding=utf-8
 # Copyright 2024 Lite-AI and the HuggingFace Inc. team. All rights reserved.
 #
 # This code is based on MistralForCausalLM from transformers.
-# It has been modified from its original forms to accommodate 
-# minor architectural differences compared to 
+# It has been modified from its original forms to accommodate
+# minor architectural differences compared to
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
